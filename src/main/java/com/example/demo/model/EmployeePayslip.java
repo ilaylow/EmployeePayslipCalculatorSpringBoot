@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EmployeePayslip {
 
-    private final int payPeriod, grossIncome, incomeTax, netIncome; //Rounded, so all are ints
+    private final int superannuation, grossIncome, incomeTax, netIncome; //Rounded, so all are ints
+    private final String fromDate, toDate;
 
-    public int getPayPeriod() {
-        return payPeriod;
+    public int getSuperannuation() {
+        return superannuation;
     }
 
     public int getGrossIncome() {
@@ -22,14 +23,26 @@ public class EmployeePayslip {
         return netIncome;
     }
 
-    public EmployeePayslip(@JsonProperty("payPeriod") int payPeriod,
+    public String getFromDate() {
+        return fromDate;
+    }
+
+    public String getToDate() {
+        return toDate;
+    }
+
+    public EmployeePayslip(@JsonProperty("superannuation") int superannuation,
                            @JsonProperty("grossIncome") int grossIncome,
                            @JsonProperty("incomeTax") int incomeTax,
-                           @JsonProperty("netIncome") int netIncome) {
+                           @JsonProperty("netIncome") int netIncome,
+                           @JsonProperty("fromDate") String fromDate,
+                           @JsonProperty("toDate") String toDate) {
 
-        this.payPeriod = payPeriod;
+        this.superannuation = superannuation;
         this.grossIncome = grossIncome;
         this.incomeTax = incomeTax;
         this.netIncome = netIncome;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
     }
 }

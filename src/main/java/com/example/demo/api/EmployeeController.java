@@ -2,6 +2,7 @@ package com.example.demo.api;
 
 import com.example.demo.model.EmployeeDetails;
 import com.example.demo.model.EmployeePayslip;
+import com.example.demo.model.EmployeeTuple;
 import com.example.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +22,16 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public @ResponseBody List<EmployeePayslip> addEmployee(@RequestBody EmployeeDetails employeeDetails){
-        EmployeePayslip paySlip = employeeService.addEmployee(employeeDetails);
-        List<EmployeePayslip> payslipList = new ArrayList<>();
-        payslipList.add(paySlip);
-        return payslipList;
+    public @ResponseBody List<EmployeeTuple<EmployeeDetails, EmployeePayslip>> addEmployee(@RequestBody List<EmployeeDetails> employeeDetailsList){
+        List<EmployeeTuple<EmployeeDetails, EmployeePayslip>> tupleList = new ArrayList<>();
+        for(EmployeeDetails employeeDetails: employeeDetailsList){
+            EmployeeTuple<EmployeeDetails, EmployeePayslip> paySlip = employeeService.addEmployee(employeeDetails);
+            tupleList.add(paySlip);
+        }
+        for (EmployeeTuple<EmployeeDetails, EmployeePayslip> tuple: tupleList){
+            System.out.println(tuple.getEmployeePayslip().getSuperannuation());
+        }
+        return tupleList;
     }
 
     @GetMapping
