@@ -3,9 +3,21 @@ package com.example.demo.dao;
 import com.example.demo.model.EmployeeDetails;
 import com.example.demo.model.EmployeePayslip;
 import com.example.demo.model.EmployeeTuple;
+import com.fasterxml.jackson.core.JsonParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Repository;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.Calendar;
 import java.text.DateFormatSymbols;
@@ -20,6 +32,11 @@ public class EmployeeDataAccessService implements EmployeeDao {
     private Calendar calendar = Calendar.getInstance();
     private static List<EmployeeDetails> EmployeeDatabase = new ArrayList<>();
     private static List<EmployeePayslip> EmployeePayslipDatabase = new ArrayList<>();
+    private FileWriter fileWriter = new FileWriter("../log.txt");
+    private final JSONParser parser = new JSONParser();
+    private final JSONObject taxInfoObject = ((JSONObject) parser.parse(new FileReader("../taxrange.config.json")));
+
+    public EmployeeDataAccessService() throws IOException, ParseException { };
 
     @Override
     public EmployeeTuple<EmployeeDetails, EmployeePayslip> insertEmployeeData(UUID id, EmployeeDetails employee) {
@@ -66,28 +83,34 @@ public class EmployeeDataAccessService implements EmployeeDao {
         as well as using JSON config file to load in the ranges
          */
 
-        int remainingAmount = 0, taxAmount = 0;
-        float factor = 0.0f;
-        if (annualSalary >= 18201 && annualSalary <= 37000){
-            remainingAmount = (annualSalary - 18200);
-            factor = 0.19f;
+         // Get values from JSON
+        int[] taxBoundValues = (int[]) this.taxInfoObject.get("taxBoundValues");
+        float[] taxFactors = (float[]) this.taxInfoObject.get("factors");
+        float[] initialValues = (float[]) this.taxInfoObject.get("initials");
+        int lowBoundIndex = 0, highBoundIndex = 1, taxFactorIndex = 0, initialValuesIndex = 0;
+        while (highBoundIndex < taxBoundValues.length - 1){
+            if ((annualSalary) >= taxBoundValues[lowBoundIndex] && (annualSalary) <= taxBoundValues[highBoundIndex]){
+                break;
+            }
+            lowBoundIndex++;highBoundIndex++;taxFactorIndex++;initialValuesIndex++;
         }
-        else if (annualSalary >= 37001 && annualSalary <= 87000){
-            remainingAmount = (annualSalary - 37000);
-            taxAmount = 3572;
-            factor = 0.325f;
-        }
-        else if (annualSalary >= 87001 && annualSalary <= 180000){
-            remainingAmount = (annualSalary - 87000);
-            taxAmount = 19822;
-            factor = 0.37f;
-        }
-        else if (annualSalary >= 180001){
-            remainingAmount = (annualSalary - 180000);
-            taxAmount = 54232;
-            factor = 0.45f;
+        // Get TaxFactors
+        BigDecimal remainingAmount = BigDecimal.valueOf(annualSalary - taxBoundValues[lowBoundIndex]);
+        BigDecimal factor = BigDecimal.valueOf(taxFactors[taxFactorIndex]);
+        BigDecimal initialTax = BigDecimal.valueOf(initialValues[initialValuesIndex]);
+        try {
+            logtoFile(remainingAmount.toPlainString());
+            logtoFile(factor.toPlainString());
+            logtoFile(initialTax.toPlainString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        return BigDecimal.valueOf(Math.round((taxAmount + (remainingAmount * factor)) / 12.0));
+        return (initialTax.add((remainingAmount.multiply(factor)))).divide(BigDecimal.valueOf(12.0f), RoundingMode.UNNECESSARY);
+    }
+
+    private void logtoFile(String string) throws IOException{
+        this.fileWriter.append(string);
+        this.fileWriter.close();
     }
 }
