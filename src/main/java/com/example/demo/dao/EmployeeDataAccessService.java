@@ -5,6 +5,7 @@ import com.example.demo.model.EmployeePayslip;
 import com.example.demo.model.EmployeeTuple;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.Calendar;
 import java.text.DateFormatSymbols;
@@ -28,9 +29,9 @@ public class EmployeeDataAccessService implements EmployeeDao {
         EmployeeDatabase.add(employeeDetails);
 
         // Calculate Employees Pay Slip Information
-        int grossIncome = calculateGrossIncome(employee.getAnnualSalary());
-        int incomeTax = calculateIncomeTax(employee.getAnnualSalary());
-        int netIncome = grossIncome - incomeTax;
+        BigDecimal grossIncome = calculateGrossIncome(employee.getAnnualSalary());
+        BigDecimal incomeTax = calculateIncomeTax(employee.getAnnualSalary());
+        BigDecimal netIncome = grossIncome.subtract(incomeTax);
 
         /* Get payment period */
         String currMonth = new DateFormatSymbols().getMonths()[employee.getPaymentMonth()-1];
@@ -39,7 +40,7 @@ public class EmployeeDataAccessService implements EmployeeDao {
         String fromDate = String.join(" ", minimumDay, currMonth);
         String toDate = String.join(" ", maximumDay, currMonth);
 
-        int _super = (int) Math.round(employee.getSuperRate() * netIncome);
+        BigDecimal _super = BigDecimal.valueOf(employee.getSuperRate()).multiply(netIncome);
 
         EmployeePayslip paySlip = new EmployeePayslip(_super,
                 grossIncome, incomeTax, netIncome, fromDate, toDate);
@@ -56,11 +57,15 @@ public class EmployeeDataAccessService implements EmployeeDao {
         return EmployeeDatabase;
     }
 
-    private int calculateGrossIncome(int annualSalary){
-        return (int) Math.round(annualSalary / 12.0);
+    private BigDecimal calculateGrossIncome(int annualSalary){
+        return BigDecimal.valueOf(Math.round(annualSalary / 12.0));
     }
 
-    private int calculateIncomeTax(int annualSalary){
+    private BigDecimal calculateIncomeTax(int annualSalary){
+        /* Change this implementation to utilise Big Decimal Properly
+        as well as using JSON config file to load in the ranges
+         */
+
         int remainingAmount = 0, taxAmount = 0;
         float factor = 0.0f;
         if (annualSalary >= 18201 && annualSalary <= 37000){
@@ -83,6 +88,6 @@ public class EmployeeDataAccessService implements EmployeeDao {
             factor = 0.45f;
         }
 
-        return (int) Math.round((taxAmount + (remainingAmount * factor)) / 12.0);
+        return BigDecimal.valueOf(Math.round((taxAmount + (remainingAmount * factor)) / 12.0));
     }
 }

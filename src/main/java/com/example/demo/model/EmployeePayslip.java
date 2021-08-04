@@ -2,24 +2,26 @@ package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
+
 public class EmployeePayslip {
 
-    private final int superannuation, grossIncome, incomeTax, netIncome; //Rounded, so all are ints
+    private final BigDecimal superannuation, grossIncome, incomeTax, netIncome; //Rounded, so all are ints
     private final String fromDate, toDate;
 
-    public int getSuperannuation() {
+    public BigDecimal getSuperannuation() {
         return superannuation;
     }
 
-    public int getGrossIncome() {
+    public BigDecimal getGrossIncome() {
         return grossIncome;
     }
 
-    public int getIncomeTax() {
+    public BigDecimal getIncomeTax() {
         return incomeTax;
     }
 
-    public int getNetIncome() {
+    public BigDecimal getNetIncome() {
         return netIncome;
     }
 
@@ -31,10 +33,10 @@ public class EmployeePayslip {
         return toDate;
     }
 
-    public EmployeePayslip(@JsonProperty("superannuation") int superannuation,
-                           @JsonProperty("grossIncome") int grossIncome,
-                           @JsonProperty("incomeTax") int incomeTax,
-                           @JsonProperty("netIncome") int netIncome,
+    public EmployeePayslip(@JsonProperty("superannuation") BigDecimal superannuation,
+                           @JsonProperty("grossIncome") BigDecimal grossIncome,
+                           @JsonProperty("incomeTax") BigDecimal incomeTax,
+                           @JsonProperty("netIncome") BigDecimal netIncome,
                            @JsonProperty("fromDate") String fromDate,
                            @JsonProperty("toDate") String toDate) {
 
