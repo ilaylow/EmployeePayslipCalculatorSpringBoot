@@ -6,6 +6,8 @@ import com.example.demo.model.EmployeeTuple;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.Calendar;
+import java.text.DateFormatSymbols;
 import java.lang.Math;
 
 /* Class serves as a Data Access Object that the service layer uses, in charge of directly making updates to data
@@ -14,28 +16,9 @@ import java.lang.Math;
 @Repository("Main")
 public class EmployeeDataAccessService implements EmployeeDao {
 
+    private Calendar calendar = Calendar.getInstance();
     private static List<EmployeeDetails> EmployeeDatabase = new ArrayList<>();
     private static List<EmployeePayslip> EmployeePayslipDatabase = new ArrayList<>();
-    private static final List<String> MONTHS = new ArrayList<String>(){
-        {
-            add("January");
-            add("February");
-            add("March");
-            add("April");
-            add("May");
-            add("June");
-            add("July");
-            add("August");
-            add("September");
-            add("October");
-            add("November");
-            add("December");
-        }
-    };
-    private static final List<Integer> TYPE1_MONTH_LIST = new ArrayList<Integer>(
-            Arrays.asList(0,2,4,6,7,9, 11));
-    private static final List<Integer> TYPE2_MONTH_LIST = new ArrayList<Integer>(
-            Arrays.asList(1,3,5,8,10));
 
     @Override
     public EmployeeTuple<EmployeeDetails, EmployeePayslip> insertEmployeeData(UUID id, EmployeeDetails employee) {
@@ -48,11 +31,18 @@ public class EmployeeDataAccessService implements EmployeeDao {
         int grossIncome = calculateGrossIncome(employee.getAnnualSalary());
         int incomeTax = calculateIncomeTax(employee.getAnnualSalary());
         int netIncome = grossIncome - incomeTax;
-        String[] paymentPeriod = getPaymentDate(employee.getPaymentMonth());
+
+        /* Get payment period */
+        String currMonth = new DateFormatSymbols().getMonths()[employee.getPaymentMonth()-1];
+        String minimumDay = "01";
+        String maximumDay = Integer.toString(calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        String fromDate = String.join(" ", minimumDay, currMonth);
+        String toDate = String.join(" ", maximumDay, currMonth);
+
         int _super = (int) Math.round(employee.getSuperRate() * netIncome);
 
         EmployeePayslip paySlip = new EmployeePayslip(_super,
-                grossIncome, incomeTax, netIncome, paymentPeriod[0], paymentPeriod[1]);
+                grossIncome, incomeTax, netIncome, fromDate, toDate);
 
         EmployeePayslipDatabase.add(paySlip);
         EmployeeTuple<EmployeeDetails, EmployeePayslip> employeeTuple = new EmployeeTuple<>(employeeDetails, paySlip);
@@ -68,25 +58,6 @@ public class EmployeeDataAccessService implements EmployeeDao {
 
     private int calculateGrossIncome(int annualSalary){
         return (int) Math.round(annualSalary / 12.0);
-    }
-
-    private String[] getPaymentDate(int paymentMonth){
-
-        /* Assume month is valid, (0-11) */
-        String startDate = "01", lastDate = "30";
-        String month = MONTHS.get(paymentMonth);
-        if (TYPE1_MONTH_LIST.contains(paymentMonth)){
-            lastDate = "31";
-        }
-        else if (TYPE2_MONTH_LIST.contains(paymentMonth)){
-            lastDate = "30";
-            if (paymentMonth == 1) {
-                lastDate = "28";
-            }
-        }
-
-        return new String[]{String.join(" ", startDate, month), String.join(" ", lastDate, month)};
-
     }
 
     private int calculateIncomeTax(int annualSalary){
