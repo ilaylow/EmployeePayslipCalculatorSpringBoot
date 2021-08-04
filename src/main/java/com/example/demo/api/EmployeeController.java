@@ -23,15 +23,7 @@ public class EmployeeController {
 
     @PostMapping
     public @ResponseBody List<EmployeeTuple<EmployeeDetails, EmployeePayslip>> addEmployee(@RequestBody List<EmployeeDetails> employeeDetailsList){
-        List<EmployeeTuple<EmployeeDetails, EmployeePayslip>> tupleList = new ArrayList<>();
-        for(EmployeeDetails employeeDetails: employeeDetailsList){
-            EmployeeTuple<EmployeeDetails, EmployeePayslip> paySlip = employeeService.addEmployee(employeeDetails);
-            tupleList.add(paySlip);
-        }
-        for (EmployeeTuple<EmployeeDetails, EmployeePayslip> tuple: tupleList){
-            System.out.println(tuple.getEmployeePayslip().getSuperannuation());
-        }
-        return tupleList;
+        return this.employeeService.addEmployee(employeeDetailsList);
     }
 
     @GetMapping

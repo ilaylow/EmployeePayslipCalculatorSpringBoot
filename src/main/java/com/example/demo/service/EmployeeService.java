@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /* Class represents where business logic happens
@@ -23,8 +24,13 @@ public class EmployeeService {
         this.employeeDao = employeeDao;
     }
 
-    public EmployeeTuple<EmployeeDetails, EmployeePayslip> addEmployee(EmployeeDetails employeeDetails){
-        return this.employeeDao.insertEmployeeData(employeeDetails);
+    public List<EmployeeTuple<EmployeeDetails, EmployeePayslip>> addEmployee(List<EmployeeDetails> employeeDetailsList){
+        List<EmployeeTuple<EmployeeDetails, EmployeePayslip>> tupleList = new ArrayList<>();
+        for(EmployeeDetails employeeDetails: employeeDetailsList){
+            EmployeeTuple<EmployeeDetails, EmployeePayslip> tuple = this.employeeDao.insertEmployeeData(employeeDetails);
+            tupleList.add(tuple);
+        }
+        return tupleList;
     }
 
     public List<EmployeeDetails> getAllEmployees(){
