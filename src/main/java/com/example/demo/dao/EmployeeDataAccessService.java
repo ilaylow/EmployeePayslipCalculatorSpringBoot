@@ -3,18 +3,17 @@ package com.example.demo.dao;
 import com.example.demo.model.EmployeeDetails;
 import com.example.demo.model.EmployeePayslip;
 import com.example.demo.model.EmployeeTuple;
-import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
+import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Repository;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileWriter;
-import java.io.PrintWriter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -29,12 +28,13 @@ import java.lang.Math;
 @Repository("Main")
 public class EmployeeDataAccessService implements EmployeeDao {
 
-    private Calendar calendar = Calendar.getInstance();
+    private final Calendar calendar = Calendar.getInstance();
     private static List<EmployeeDetails> EmployeeDatabase = new ArrayList<>();
     private static List<EmployeePayslip> EmployeePayslipDatabase = new ArrayList<>();
-    private FileWriter fileWriter = new FileWriter("../log.txt");
+    private final FileWriter fileWriter = new FileWriter("../log.txt");
     private final JSONParser parser = new JSONParser();
-    private final JSONObject taxInfoObject = ((JSONObject) parser.parse(new FileReader("../taxrange.config.json")));
+    private final Object obj = parser.parse(new FileReader("C:\\Users\\chuen\\Desktop\\Java\\TaxCalculator\\src\\main\\java\\com\\example\\demo\\taxrange.config.json"));
+    private final JSONObject taxInfoObject = (JSONObject) obj;
 
     public EmployeeDataAccessService() throws IOException, ParseException { };
 
@@ -82,22 +82,23 @@ public class EmployeeDataAccessService implements EmployeeDao {
         /* Change this implementation to utilise Big Decimal Properly
         as well as using JSON config file to load in the ranges
          */
+        System.out.println("YEETUS");
 
          // Get values from JSON
-        int[] taxBoundValues = (int[]) this.taxInfoObject.get("taxBoundValues");
-        float[] taxFactors = (float[]) this.taxInfoObject.get("factors");
-        float[] initialValues = (float[]) this.taxInfoObject.get("initials");
-        int lowBoundIndex = 0, highBoundIndex = 1, taxFactorIndex = 0, initialValuesIndex = 0;
-        while (highBoundIndex < taxBoundValues.length - 1){
-            if ((annualSalary) >= taxBoundValues[lowBoundIndex] && (annualSalary) <= taxBoundValues[highBoundIndex]){
+        JSONArray taxBoundValues = ((JSONArray) this.taxInfoObject.get("taxBoundValues"));
+        JSONArray taxFactors = (JSONArray) this.taxInfoObject.get("factors");
+        JSONArray initialValues = (JSONArray) this.taxInfoObject.get("initials");
+        int lowBoundIndex = 0, highBoundIndex = 0, taxFactorIndex = 0, initialValuesIndex = 0;
+        while (highBoundIndex < taxBoundValues.size() - 1){
+            if ((annualSalary) >= (Long)taxBoundValues.get(lowBoundIndex) && (annualSalary) <= (Long)taxBoundValues.get(highBoundIndex)){
                 break;
             }
             lowBoundIndex++;highBoundIndex++;taxFactorIndex++;initialValuesIndex++;
         }
         // Get TaxFactors
-        BigDecimal remainingAmount = BigDecimal.valueOf(annualSalary - taxBoundValues[lowBoundIndex]);
-        BigDecimal factor = BigDecimal.valueOf(taxFactors[taxFactorIndex]);
-        BigDecimal initialTax = BigDecimal.valueOf(initialValues[initialValuesIndex]);
+        BigDecimal remainingAmount = BigDecimal.valueOf(annualSalary - (Long)taxBoundValues.get(lowBoundIndex));
+        BigDecimal factor = BigDecimal.valueOf((Double)taxFactors.get(taxFactorIndex));
+        BigDecimal initialTax = BigDecimal.valueOf((Long)initialValues.get(initialValuesIndex));
         try {
             logtoFile(remainingAmount.toPlainString());
             logtoFile(factor.toPlainString());
@@ -106,7 +107,7 @@ public class EmployeeDataAccessService implements EmployeeDao {
             e.printStackTrace();
         }
 
-        return (initialTax.add((remainingAmount.multiply(factor)))).divide(BigDecimal.valueOf(12.0f), RoundingMode.UNNECESSARY);
+        return (initialTax.add((remainingAmount.multiply(factor)))).divide(BigDecimal.valueOf(12.0f), RoundingMode.HALF_UP);
     }
 
     private void logtoFile(String string) throws IOException{
