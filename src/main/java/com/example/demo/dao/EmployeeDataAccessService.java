@@ -31,9 +31,9 @@ public class EmployeeDataAccessService implements EmployeeDao {
     private final Calendar calendar = Calendar.getInstance();
     private static List<EmployeeDetails> EmployeeDatabase = new ArrayList<>();
     private static List<EmployeePayslip> EmployeePayslipDatabase = new ArrayList<>();
-    private final FileWriter fileWriter = new FileWriter("../log.txt");
+    private final FileWriter fileWriter = new FileWriter("src\\main\\java\\com\\example\\demo\\log.txt");
     private final JSONParser parser = new JSONParser();
-    private final Object obj = parser.parse(new FileReader("C:\\Users\\chuen\\Desktop\\Java\\TaxCalculator\\src\\main\\java\\com\\example\\demo\\taxrange.config.json"));
+    private final Object obj = parser.parse(new FileReader("src\\main\\java\\com\\example\\demo\\taxrange.config.json"));
     private final JSONObject taxInfoObject = (JSONObject) obj;
 
     public EmployeeDataAccessService() throws IOException, ParseException { };
@@ -82,9 +82,13 @@ public class EmployeeDataAccessService implements EmployeeDao {
         /* Change this implementation to utilise Big Decimal Properly
         as well as using JSON config file to load in the ranges
          */
-        System.out.println("YEETUS");
+        try {
+            this.logtoFile("Calculating Income Tax...\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-         // Get values from JSON
+        // Get values from JSON
         JSONArray taxBoundValues = ((JSONArray) this.taxInfoObject.get("taxBoundValues"));
         JSONArray taxFactors = (JSONArray) this.taxInfoObject.get("factors");
         JSONArray initialValues = (JSONArray) this.taxInfoObject.get("initials");
@@ -99,11 +103,12 @@ public class EmployeeDataAccessService implements EmployeeDao {
         BigDecimal remainingAmount = BigDecimal.valueOf(annualSalary - (Long)taxBoundValues.get(lowBoundIndex));
         BigDecimal factor = BigDecimal.valueOf((Double)taxFactors.get(taxFactorIndex));
         BigDecimal initialTax = BigDecimal.valueOf((Long)initialValues.get(initialValuesIndex));
-        try {
-            logtoFile(remainingAmount.toPlainString());
-            logtoFile(factor.toPlainString());
-            logtoFile(initialTax.toPlainString());
-        } catch (IOException e) {
+
+        try{
+            this.logtoFile(remainingAmount.toString() + "\n");
+            this.logtoFile(factor.toString() + "\n");
+            this.logtoFile(initialTax.toString() + "\n");
+        } catch(IOException e){
             e.printStackTrace();
         }
 
@@ -112,6 +117,6 @@ public class EmployeeDataAccessService implements EmployeeDao {
 
     private void logtoFile(String string) throws IOException{
         this.fileWriter.append(string);
-        this.fileWriter.close();
+        this.fileWriter.flush();
     }
 }

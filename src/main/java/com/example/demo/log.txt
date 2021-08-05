@@ -1,0 +1,8 @@
+Calculating Income Tax...
+-119950
+0.45
+54232
+Calculating Income Tax...
+-60000
+0.45
+54232
