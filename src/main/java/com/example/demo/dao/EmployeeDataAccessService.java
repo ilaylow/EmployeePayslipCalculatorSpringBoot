@@ -57,7 +57,11 @@ public class EmployeeDataAccessService implements EmployeeDao {
         String fromDate = String.join(" ", minimumDay, currMonth);
         String toDate = String.join(" ", maximumDay, currMonth);
 
-        BigDecimal _super = BigDecimal.valueOf(employee.getSuperRate()).multiply(netIncome);
+        BigDecimal _super = BigDecimal.valueOf(employee.getSuperRate()).multiply(grossIncome);
+
+        System.out.println(netIncome);
+        System.out.println(employee.getSuperRate());
+        System.out.println("Super: " + _super);
 
         EmployeePayslip paySlip = new EmployeePayslip(_super,
                 grossIncome, incomeTax, netIncome, fromDate, toDate);
@@ -75,7 +79,7 @@ public class EmployeeDataAccessService implements EmployeeDao {
     }
 
     private BigDecimal calculateGrossIncome(int annualSalary){
-        return BigDecimal.valueOf(Math.round(annualSalary / 12.0));
+        return BigDecimal.valueOf(Math.round(annualSalary / 12.0f));
     }
 
     private BigDecimal calculateIncomeTax(int annualSalary){
@@ -83,7 +87,7 @@ public class EmployeeDataAccessService implements EmployeeDao {
         as well as using JSON config file to load in the ranges
          */
         try {
-            this.logtoFile("Calculating Income Tax...\n");
+            this.logtoFile("Calculating Income Tax ...\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,22 +96,23 @@ public class EmployeeDataAccessService implements EmployeeDao {
         JSONArray taxBoundValues = ((JSONArray) this.taxInfoObject.get("taxBoundValues"));
         JSONArray taxFactors = (JSONArray) this.taxInfoObject.get("factors");
         JSONArray initialValues = (JSONArray) this.taxInfoObject.get("initials");
-        int lowBoundIndex = 0, highBoundIndex = 0, taxFactorIndex = 0, initialValuesIndex = 0;
+        int lowBoundIndex = 0, highBoundIndex = 1, taxFactorIndex = 0, initialValuesIndex = 0;
         while (highBoundIndex < taxBoundValues.size() - 1){
             if ((annualSalary) >= (Long)taxBoundValues.get(lowBoundIndex) && (annualSalary) <= (Long)taxBoundValues.get(highBoundIndex)){
                 break;
             }
             lowBoundIndex++;highBoundIndex++;taxFactorIndex++;initialValuesIndex++;
         }
+
         // Get TaxFactors
         BigDecimal remainingAmount = BigDecimal.valueOf(annualSalary - (Long)taxBoundValues.get(lowBoundIndex));
         BigDecimal factor = BigDecimal.valueOf((Double)taxFactors.get(taxFactorIndex));
         BigDecimal initialTax = BigDecimal.valueOf((Long)initialValues.get(initialValuesIndex));
 
         try{
-            this.logtoFile(remainingAmount.toString() + "\n");
-            this.logtoFile(factor.toString() + "\n");
-            this.logtoFile(initialTax.toString() + "\n");
+            this.logtoFile("Remaining Amount: " + remainingAmount.toString() + "\n");
+            this.logtoFile("Tax Factor: " + factor.toString() + "\n");
+            this.logtoFile("Initial Tax Amount: " + initialTax.toString() + "\n\n");
         } catch(IOException e){
             e.printStackTrace();
         }
