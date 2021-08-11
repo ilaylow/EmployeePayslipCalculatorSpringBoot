@@ -33,7 +33,7 @@ public class EmployeeDataAccessService implements EmployeeDao {
     private static List<EmployeePayslip> EmployeePayslipDatabase = new ArrayList<>();
     private final FileWriter fileWriter = new FileWriter("src\\main\\java\\com\\example\\demo\\log.txt");
     private final JSONParser parser = new JSONParser();
-    private final Object obj = parser.parse(new FileReader("src\\main\\java\\com\\example\\demo\\taxrange.config.json"));
+    private final Object obj = parser.parse(new FileReader("target\\taxrange.config.json"));
     private final JSONObject taxInfoObject = (JSONObject) obj;
 
     public EmployeeDataAccessService() throws IOException, ParseException { };

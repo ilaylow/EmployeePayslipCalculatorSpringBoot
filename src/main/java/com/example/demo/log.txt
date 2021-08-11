@@ -1,0 +1,10 @@
+Calculating Income Tax ...
+Remaining Amount: 23050
+Tax Factor: 0.325
+Initial Tax Amount: 3572
+
+Calculating Income Tax ...
+Remaining Amount: 33000
+Tax Factor: 0.37
+Initial Tax Amount: 19822
+
