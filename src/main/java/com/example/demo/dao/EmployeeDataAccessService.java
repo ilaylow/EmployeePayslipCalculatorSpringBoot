@@ -40,12 +40,12 @@ public class EmployeeDataAccessService implements EmployeeDao {
 
     @Override
     public EmployeeTuple<EmployeeDetails, EmployeePayslip> insertEmployeeData(UUID id, EmployeeDetails employee) {
-        // Assume that insertion to in-memory database (ArrayList) always works, so it always returns 1
+        /* Assume that insertion to in-memory database (ArrayList) always works, so it always returns 1 */
         EmployeeDetails employeeDetails = new EmployeeDetails(id, employee.getFirstName(), employee.getLastName(),
                 employee.getAnnualSalary(), employee.getPaymentMonth(), employee.getSuperRate());
         EmployeeDatabase.add(employeeDetails);
 
-        // Calculate Employees Pay Slip Information
+        /* Calculate Employees Pay Slip Information */
         BigDecimal grossIncome = calculateGrossIncome(employee.getAnnualSalary());
         BigDecimal incomeTax = calculateIncomeTax(employee.getAnnualSalary());
         BigDecimal netIncome = grossIncome.subtract(incomeTax);
@@ -68,7 +68,6 @@ public class EmployeeDataAccessService implements EmployeeDao {
 
         EmployeePayslipDatabase.add(paySlip);
         EmployeeTuple<EmployeeDetails, EmployeePayslip> employeeTuple = new EmployeeTuple<>(employeeDetails, paySlip);
-        // Want to return here tuples of Employee and payslip information
 
         return employeeTuple;
     }

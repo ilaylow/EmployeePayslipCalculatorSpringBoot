@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Entered the build phase ...
+      - mvn clean package
+    post_build:
+      commands:
+        - echo Built complete
+
+artifacts:
+  files:
+    - target/payslip-calculator-spring-boot.jar
+  discard-paths: yes
