@@ -1,0 +1,5 @@
+version: 0.0
+os: linux
+files:
+  - source: ./payslip-calculator-spring-boot.jar
+    destination: /tmp
