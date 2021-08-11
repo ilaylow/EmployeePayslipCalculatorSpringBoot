@@ -11,6 +11,6 @@ phases:
 
 artifacts:
   files:
+    - '**/*'
     - target/payslip-calculator-spring-boot.jar
-    - target/taxrange.config.json
-  discard-paths: yes
+    base-directory: 'target'
