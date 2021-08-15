@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileWriter;
@@ -31,9 +32,11 @@ public class EmployeeDataAccessService implements EmployeeDao {
     private final Calendar calendar = Calendar.getInstance();
     private static List<EmployeeDetails> EmployeeDatabase = new ArrayList<>();
     private static List<EmployeePayslip> EmployeePayslipDatabase = new ArrayList<>();
+
+    ClassLoader classLoader = getClass().getClassLoader();
     private final FileWriter fileWriter = new FileWriter("src\\main\\java\\com\\example\\demo\\log.txt");
     private final JSONParser parser = new JSONParser();
-    private final Object obj = parser.parse(new FileReader("target\\taxrange.config.json"));
+    private final Object obj = parser.parse(new FileReader(classLoader.getResource("taxrange.config.json").getFile()));
     private final JSONObject taxInfoObject = (JSONObject) obj;
 
     public EmployeeDataAccessService() throws IOException, ParseException { };
