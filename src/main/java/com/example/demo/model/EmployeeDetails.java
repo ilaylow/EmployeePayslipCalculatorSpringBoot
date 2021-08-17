@@ -49,4 +49,13 @@ public class EmployeeDetails {
     public float getSuperRate() {
         return superRate;
     }
+
+    public String toString() {
+        return String.format("{firstName: %s,\n" +
+                "lastName: %s,\n" +
+                "annualSalary: %d,\n" +
+                "paymentMonth: %d,\n" +
+                "superRate: %.2f}", firstName, lastName, annualSalary, paymentMonth, superRate);
+
+    }
 }

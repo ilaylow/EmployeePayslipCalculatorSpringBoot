@@ -19,4 +19,11 @@ public class EmployeeTuple<S extends EmployeeDetails, T extends EmployeePayslip>
     public T getEmployeePayslip() {
         return employeePayslip;
     }
+
+    @Override
+    public String toString(){
+        return String.format("{EmployeeDetails: %s,\n" +
+                "EmployeePayslip: %s}", employeeDetails.toString(), employeePayslip.toString());
+
+    }
 }

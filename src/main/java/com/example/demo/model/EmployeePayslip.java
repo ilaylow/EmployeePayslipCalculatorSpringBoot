@@ -47,4 +47,12 @@ public class EmployeePayslip {
         this.fromDate = fromDate;
         this.toDate = toDate;
     }
+
+    public String toString(){
+        return String.format("{grossIncome: %.2f,\n" +
+                "incomeTax: %.2f,\n" +
+                "netIncome: %.2f,\n" +
+                "fromDate: %s,\n" +
+                "toDate: %s}", grossIncome, incomeTax, netIncome, fromDate, toDate);
+    }
 }
