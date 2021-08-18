@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.dao.EmployeeDao;
 import com.example.demo.dao.EmployeeDataAccessService;
 import com.example.demo.model.EmployeeDetails;
 import com.example.demo.model.EmployeePayslip;
@@ -7,26 +8,36 @@ import com.example.demo.model.EmployeeTuple;
 import com.example.demo.service.EmployeeService;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class TaxCalcApplicationTests {
 
-	@Autowired
-	private EmployeeService employeeService;
+	private final EmployeeService employeeService;
 
-	@MockBean
-	private EmployeeDataAccessService repository;
+	private final EmployeeDao employeeDao;
+
+	@Autowired
+	public TaxCalcApplicationTests(@Qualifier("Main") EmployeeDao employeeDao, EmployeeService employeeService){
+		this.employeeDao = employeeDao;
+		this.employeeService = employeeService;
+	}
 
 	@Test
 	void insertInEmployees(){
@@ -42,14 +53,34 @@ class TaxCalcApplicationTests {
 
 		/* Filter out employees that have a netIncome of less than 40K */
 		Stream<EmployeeTuple<EmployeeDetails, EmployeePayslip>> employeeStream = responseList.stream();
-		employeeStream.filter();
+		List<EmployeeTuple<EmployeeDetails, EmployeePayslip>> employeeFilterList = responseList.stream().filter(tuple -> tuple.
+				getEmployeePayslip().
+				getNetIncome().
+				compareTo(BigDecimal.valueOf(2000)) < 0).
+				collect(Collectors.toList());
+
+		/* Print out Employee Details */
+		employeeFilterList.forEach(e -> System.out.println(e.toString()));
+
+		/* Assertion Equality Check */
+		Optional<EmployeeTuple<EmployeeDetails, EmployeePayslip>> employee = employeeFilterList.stream().findFirst();
+
+		assertEquals(employee.
+				get().
+				getEmployeePayslip().
+				getNetIncome().
+				compareTo(BigDecimal.valueOf(1638.50f)), 0);
+
 	}
 
 	@Test
 	void getCurrentEmployeeGrossIncome() {
-		List<EmployeeDetails> employees = repository.showEmployees();
-		Stream<EmployeeDetails> employeeStream = employees.stream();
+		List<EmployeePayslip> employeePayslips = employeeDao.showPayslips();
 
+	/* Get current annual grossIncomes above 2000 for all Employees */
+		employeePayslips.stream().
+				filter(e -> e.getGrossIncome().compareTo(BigDecimal.valueOf(2000)) < 0).
+				forEach(e -> System.out.format("GrossMonthly: %.2f", e.getGrossIncome()));
 	}
 
 }

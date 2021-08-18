@@ -16,4 +16,5 @@ public interface EmployeeDao {
     }
 
     List<EmployeeDetails> showEmployees();
+    List<EmployeePayslip> showPayslips();
 }

@@ -22,8 +22,8 @@ public class EmployeeTuple<S extends EmployeeDetails, T extends EmployeePayslip>
 
     @Override
     public String toString(){
-        return String.format("{EmployeeDetails: %s,\n" +
-                "EmployeePayslip: %s}", employeeDetails.toString(), employeePayslip.toString());
+        return String.format("\n{EmployeeDetails: %s,\n" +
+                "EmployeePayslip: %s}\n", employeeDetails.toString(), employeePayslip.toString());
 
     }
 }

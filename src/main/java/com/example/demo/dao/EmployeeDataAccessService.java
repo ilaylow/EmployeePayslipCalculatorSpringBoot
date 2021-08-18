@@ -62,10 +62,6 @@ public class EmployeeDataAccessService implements EmployeeDao {
 
         BigDecimal _super = BigDecimal.valueOf(employee.getSuperRate()).multiply(grossIncome);
 
-        System.out.println(netIncome);
-        System.out.println(employee.getSuperRate());
-        System.out.println("Super: " + _super);
-
         EmployeePayslip paySlip = new EmployeePayslip(_super,
                 grossIncome, incomeTax, netIncome, fromDate, toDate);
 
@@ -80,7 +76,9 @@ public class EmployeeDataAccessService implements EmployeeDao {
         return EmployeeDatabase;
     }
 
-    private BigDecimal calculateGrossIncome(int annualSalary){
+    public List<EmployeePayslip> showPayslips() { return EmployeePayslipDatabase; }
+
+    public BigDecimal calculateGrossIncome(int annualSalary){
         return BigDecimal.valueOf(Math.round(annualSalary / 12.0f));
     }
 
