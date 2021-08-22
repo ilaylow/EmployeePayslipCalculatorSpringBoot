@@ -5,29 +5,26 @@ on:
     branches:
       - master
     paths:
-      - 'src/**'
+      - "src/**"
 
 env:
-  AWS_REGION: us-east-2                  # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: payslip-image-repo         # set this to your Amazon ECR repository name
+  AWS_REGION: us-east-2 # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: payslip-image-repo # set this to your Amazon ECR repository name
 
 jobs:
   run_tests:
     runs-on: ubuntu-latest
 
     steps:
-      -name: Checkout Repo
       -uses: actions/checkout@v2
-
-      -name: Setting Up JDK 11
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
-        distribution: 'adopt'
+        java-version: "11"
+        distribution: "adopt"
 
       -name: Build & Test With Maven
       run: mvn -B test --file pom.xml
-  
+
   deploy:
     name: Deploy To AWS
     needs: run_tests
@@ -63,4 +60,3 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
