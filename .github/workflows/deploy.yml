@@ -36,6 +36,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Build JAR File
+        uses: actions/setup-java@v2
+        with:
+          java-version: "11"
+          distribution: "adopt"
+      - name: Build Target File
+        run: mvn clean install
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
