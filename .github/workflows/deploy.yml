@@ -18,13 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set Up JDK 11
-      uses: actions/setup-java@v2
-      with:
-        java-version: "11"
-        distribution: "adopt"
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
       - name: Build & Test With Maven
-      run: mvn -B test --file pom.xml
+        run: mvn -B test --file pom.xml
 
   deploy:
     name: Deploy To AWS
