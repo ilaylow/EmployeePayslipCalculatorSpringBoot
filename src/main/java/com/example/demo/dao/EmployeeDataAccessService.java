@@ -36,7 +36,7 @@ public class EmployeeDataAccessService implements EmployeeDao {
     private final JSONParser parser = new JSONParser();
     private final Object obj = parser.parse(new BufferedReader(new InputStreamReader(i)));
     private final JSONObject taxInfoObject = (JSONObject) obj;
-
+    //TODO: Try JACKSON
     public EmployeeDataAccessService() throws IOException, ParseException { };
 
     @Override
